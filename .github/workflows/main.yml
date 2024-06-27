@@ -19,8 +19,7 @@ jobs:
 
       - name: Modify Last Update
         run: |
-          d=`date '+%Y-%m-%dT%H:%M:%SZ'`
-          echo $d > LAST_UPDATED
+          echo 'console.log("Hello Worlds!")' > LAST_UPDATED.js
 
       - name: Commit Changes
         run: |
@@ -28,20 +27,8 @@ jobs:
           git config --local user.email "developermonuar@gmail.com"
           git add -A
 
-          arr[0]="chore(bot): 🔥 auto commit"
-          arr[1]="chore(bot): 💀 auto commit"
-          arr[2]="chore(bot): 👹 auto commit"
-          arr[3]="chore(bot): 👺 auto commit"
-          arr[4]="chore(bot): 🤡 auto commit"
-          arr[5]="chore(bot): 👻 auto commit"
-          arr[6]="chore(bot): 👽 auto commit"
-          arr[7]="chore(bot): 🤖 auto commit"
-          arr[8]="chore(bot): 👾 auto commit"
-          arr[9]="chore(bot): 😈 auto commit"
-
-          rand=$[$RANDOM % ${#arr[@]}]
-
-          git commit -m "${arr[$rand]}"
+          timestamp=$(date '+%Y-%m-%dT%H:%M:%SZ')
+          git commit -m "🤖 — $timestamp"
 
       - name: GitHub Push
         uses: ad-m/github-push-action@master
