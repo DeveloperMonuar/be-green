@@ -1,46 +1,33 @@
-name: BE GREEN
+name: Auto Commit
 
 on:
-  push:
-    branches:
-      - main
-
   schedule:
-    - cron: '0 4,12,15,18,19 * * *' # See https://crontab.guru/#0_4,12,15,18,19_*_*_*
+    # Runs at 00:00, 06:00, 12:00, and 18:00 UTC every day
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch:  # Allows manual triggering from the Actions tab
 
 jobs:
-  auto_commit:
+  auto-commit:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          persist-credentials: false
-          fetch-depth: 0
+    permissions:
+      contents: write  # Required to push commits
 
-      - name: Modify Last Update
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make changes (update timestamp file)
         run: |
-          d=`date '+%Y-%m-%dT%H:%M:%SZ'`
-          echo $d > LAST_UPDATED
-      - name: Commit Changes
+          echo "Last automated commit: $(date -u)" > activity.log
+          # You can also modify any other file or create new ones
+
+      - name: Commit and push changes
+        env:
+          # Use the built-in GITHUB_TOKEN (no need to create a secret manually)
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config --local user.name "DeveloperMonuar"
-          git config --local user.email "developermonuar@gmail.com"
-          git add -A
-          arr[0]="chore(bot): 🔥 auto commit"
-          arr[1]="chore(bot): 💀 auto commit"
-          arr[2]="chore(bot): 👹 auto commit"
-          arr[3]="chore(bot): 👺 auto commit"
-          arr[4]="chore(bot): 🤡 auto commit"
-          arr[5]="chore(bot): 👻 auto commit"
-          arr[6]="chore(bot): 👽 auto commit"
-          arr[7]="chore(bot): 🤖 auto commit"
-          arr[8]="chore(bot): 👾 auto commit"
-          arr[9]="chore(bot): 😈 auto commit"
-          rand=$[$RANDOM % ${#arr[@]}]
-          git commit -m "${arr[$rand]}"
-      - name: GitHub Push
-        uses: ad-m/github-push-action@master
-        with:
-          force: true
-          directory: '.'
-          github_token: ${{ secrets.GIT_HUB_TOKEN }}
+          git config --global user.name "developerMonuar"
+          git config --global user.email "developermonuar@gmail.com"
+          git add activity.log
+          git diff --quiet && git diff --staged --quiet || git commit -m "Automated commit $(date -u)"
+          git push
